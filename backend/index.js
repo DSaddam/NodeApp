@@ -2,7 +2,8 @@ const crypto = require('crypto');
 const nonce = require('nonce')();
 const request = require('request-promise');
 const querystring = require('querystring');
-// const databaseData = require('./routes/db');
+const databaseData = require('./db/demo_db_connection');
+
 const cookie = require('cookie');
 const express = require('express');
 const path = require('path');
@@ -27,7 +28,7 @@ const apisecret = SHOPIFY_API_SECRET;
 
 const scopes = "read_orders,write_orders,read_products,write_products,read_customers,write_customers,read_shipping,write_shipping";
 
-const forwardingaddress = "https://ca33-2409-4050-2ec0-d46d-857-8177-f978-59e2.in.ngrok.io";
+const forwardingaddress = "https://43c2-2405-204-330b-e50-6535-f3ef-c327-d77b.in.ngrok.io";
 
 app.get('/shopify', (req, res) => {
     // Shop Name
@@ -120,6 +121,22 @@ app.get('/shopify/callback', (req, res) => {
     }
 });
 
+app.post('/data',(req,res)=>{
+    var title = req.body.post.title;
+    var nftImage = req.body.post.file;
+    var start_date = req.body.post.StartDate;
+    var end_date = req.body.post.EndDate;
+    console.log(title,nftImage,start_date,end_date)
+    databaseData.connect(function(err) {
+        if (err) throw err;
+        console.log("Connected!");
+        var sql = `INSERT INTO npt_table (title, discripton,start_date,end_date) VALUES ('${title}', '${nftImage}','${start_date}','${end_date}')`;
+        databaseData.query(sql, function (err, result) {
+          if (err) throw err;
+          console.log("1 record inserted");
+        });
+      });
+})
 app.listen(3001, () => {
     console.log("running on port 3001")
 })
