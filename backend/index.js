@@ -8,7 +8,8 @@ const cookie = require('cookie');
 const express = require('express');
 const path = require('path');
 const dotenv = require('dotenv');
-var cors = require('cors')
+var cors = require('cors');
+const { json } = require('express');
 dotenv.config();
 const { SHOPIFY_API_KEY, SHOPIFY_API_SECRET } = process.env;
 const app = express();
@@ -26,9 +27,9 @@ const apiKey = SHOPIFY_API_KEY;
 
 const apisecret = SHOPIFY_API_SECRET;
 
-const scopes = "read_orders,write_orders,read_products,write_products,read_customers,write_customers,read_shipping,write_shipping";
+const scopes = "read_orders,write_orders,read_products,write_products,read_customers,write_customers,read_shipping,write_shipping ,read_themes,write_themes";
 
-const forwardingaddress = "https://43c2-2405-204-330b-e50-6535-f3ef-c327-d77b.in.ngrok.io";
+const forwardingaddress = "https://shopify.beyondclub.xyz/node";
 
 app.get('/shopify', (req, res) => {
     // Shop Name
@@ -98,7 +99,8 @@ app.get('/shopify/callback', (req, res) => {
                     .then((apiResponse) => {
                         // res.send('/index.html');
                         // GetAccessToken(accessToken);
-                        res.redirect('/?shop=' + shop);
+                        console.log("accessToken:",accessToken)
+                        res.redirect('node/?shop=' + shop);
                         //  res.end(apiResponse);
                         // dataApi(apiResponse);                      
                         //console.log("apiRequestHeaders",apiRequestHeaders);
@@ -123,22 +125,102 @@ app.get('/shopify/callback', (req, res) => {
 
 app.post('/data',(req,res)=>{
     var title = req.body.post.title;
-    var nftImage = req.body.post.file;
-    var start_date = req.body.post.StartDate;
-    var end_date = req.body.post.EndDate;
-    console.log(title,nftImage,start_date,end_date)
-    databaseData.connect(function(err) {
+    var file =  req.body.post.file;
+     var  description =  req.body.post.description;
+     var filter=   req.body.post.filter;
+     var startDate =   req.body.post.startDate;
+     var endDate =  req.body.post.endDate;
+       databaseData.connect(function(err) {
         if (err) throw err;
         console.log("Connected!");
-        var sql = `INSERT INTO npt_table (title, discripton,start_date,end_date) VALUES ('${title}', '${nftImage}','${start_date}','${end_date}')`;
+        var sql = `INSERT INTO npt_table (title, file,description,filter,startDate,endDate) VALUES ('${title}', '${file}','${description}','${filter}','${startDate}','${endDate}')`;
         databaseData.query(sql, function (err, result) {
           if (err) throw err;
           console.log("1 record inserted");
         });
       });
 })
-app.listen(3001, () => {
-    console.log("running on port 3001")
+app.put("/data",(req,res)=>{
+
+   var title = req.body.post.title;
+    var file =  req.body.post.file;
+     var  description =  req.body.post.description;
+     var filter=   req.body.post.filter;
+     var startDate =   req.body.post.startDate;
+     var endDate =  req.body.post.endDate;
+    databaseData.connect(function(err) {
+        if (err) throw err;
+        console.log("Connected!");
+        var sql = "UPDATE npt_table SET `title` = '"+title+"', `file` = '"+file+"', `discripton` = '"+description+"', `filter` = '"+startDate+"',`startDate` = '"+startDate+"',`endDate`='"+endDate+"', WHERE `title` = '"+title+"'";
+        databaseData.query(sql, function (err, result) {
+          if (err) throw err;
+          console.log("1 record inserted");
+        });
+      });
+    // const q =
+    //   "UPDATE npt_table SET `title` = '"+title+"', `file` = '"+file+"', `discripton` = '"+description+"', `filter` = '"+startDate+"',`startDate` = '"+startDate+"',`endDate`='"+endDate+"', WHERE `title` = '"+title+"'";
+  
+    // // const values = [
+    // //     req.body.post.title,
+    // //     req.body.post.file,
+    // //     req.body.post.description,
+    // //     req.body.post.filter,
+    // //     req.body.post.startDate,
+    // //     req.body.post.endDate
+    // // ];
+  
+    // databaseData.query(q, (err) => {
+    //   if (err) return res.json(err);
+  
+    //   return res.status(200).json("Usuário atualizado com sucesso.");
+    // });
 })
+    // var title = req.body.post.title;
+    // var file = req.body.post.file;
+    // var description = req.body.post.description;
+    // var filter = req.body.post.filter;
+    // var start_date = req.body.post.startDate;
+    // var endDate = req.body.post.endDate;
+    // console.log(title,start_date,end_date)
+    // databaseData.connect(function(err) {
+    //     if (err) throw err;
+    //     console.log("Connected!");
+    //     var sql = `INSERT INTO npt_table (title, discripton,start_date,end_date) VALUES ('${title}', '${nftImage}','${start_date}','${end_date}')`;
+    //     databaseData.query(sql, function (err, result) {
+    //       if (err) throw err;
+    //       console.log("1 record inserted");
+    //     });
+    //   });
+  
+    // console.log("working fine",title,file,description,filter,start_date,)
+//})
+    // app.get('/post', function (req, res, next) {
+    //     databaseData.connect(function(err) {
+    //         if (err) throw err;
+    //         databaseData.query("SELECT * FROM npt_table", function (err, result, fields) {
+    //           if (err) throw err;
+    //         //   console.log(result);
+    //              dataGet(result);
+    //         });
+    //         console.log(arrayData)
+    //       });
+   
+    //   })
+
+
+
+    const getUsers = (_, res) => {
+        const q = "SELECT * FROM npt_table";
+      
+        databaseData.query(q, (err, data) => {
+          if (err) return res.json(err);
+      
+          return res.status(200).json(data);
+        });
+      };
+      app.get("/postdata", getUsers);
+    app.listen(3003, () => {
+    console.log("running on port 3003")
+    })
 
 
