@@ -2,73 +2,34 @@ import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Container from 'react-bootstrap/Container';
-
+import axios from 'axios';
 function Create() {
-  const [title, setTitle] = useState("");
-  const [nftImage, setNftImage] = useState("");
-  const [description, setDescription] = useState("");
-  const [filter, setFilter] = useState("");
-  const [startDate, setstartDate] = useState("");
-  const [endDate, setendDate] = useState("");
+ 
+ const [post,setPost] = useState({
+    title:'',
+    file:'',
+    description:'',
+    filter:'',
+    startDate:'',
+    endDate:'',
+  });
+console.log(post)
+  const handleInput = (event) => {
+    setPost({...post,[event.target.name]:event.target.value})
+   }
+   function handleSubmit(event){
+    event.preventDefault();
+    axios.post('http://localhost:3001/data',{post})
+    .then(response=>console.log(response))
+    .catch(err=>console.log(err))
+   }
 
-  // function to update state of name with
-  // value enter by user in form
-  const handleTitleChange = (e) => {
-    setTitle(e.target.value);
-  };
-  // function to update state of age with value
-  // enter by user in form
-  const handleNftImageChange = (e) => {
-    setNftImage(URL.createObjectURL(e.target.files[0]));
-  };
-  // function to update state of email with value
-  // enter by user in form
-  const handleDescriptionChange = (e) => {
-    setDescription(e.target.value);
-  };
-  // function to update state of password with
-  // value enter by user in form
-  const handleFilterChange = (e) => {
-    setFilter(e.target.value);
-  };
-  // function to update state of confirm password
-  // with value enter by user in form
-  const handleEndDateChange = (e) => {
-    setendDate(e.target.value);
-  };
-  const handleStartDateChange = (e) => {
-    setstartDate(e.target.value);
-  };
-  // below function will be called when user
-  // click on submit button .
-  const handleSubmit = (e) => {
-    const nftJson = {
-      "title": title,
-      "description": description,
-      "image": nftImage,
-      "filter": filter,
-      "start_date": startDate,
-      "end_date": endDate
-    };
-    fetch('https://shopify.beyondclub.xyz:3002/store-data', {
-        method: 'POST',
-        // We convert the React state to JSON and send it as the POST body
-        body: JSON.stringify(nftJson)
-      }).then(function(response) {
-        console.log(response)
-        return response.json();
-      });
-
-    e.preventDefault();
-  };
   return (
     <Container>
     <div className="App">
       <header className="App-header">
         <Form
-          onSubmit={(e) => {
-            handleSubmit(e);
-          }}
+         onSubmit={handleSubmit}
         >
           {/*when user submit the form , handleSubmit()
       function will be called .*/}
@@ -77,24 +38,23 @@ function Create() {
             <Form.Label>Title:</Form.Label>
             <Form.Control
               type="text"
-              value={title}
+              name="title"
               required
-              onChange={handleTitleChange}
+              onChange={handleInput}
             />
           </Form.Group>
           <Form.Group className="mb-3" >
           <Form.Label>NFT image:</Form.Label>
-          <Form.Control type="file" required onChange={handleNftImageChange} />
-          <img src={nftImage} alt="nft" width="50" />
+          <Form.Control type="file" name="file"required onChange={handleInput} />
           </Form.Group>
           {/*when user write in age input box , handleAgeChange()
              function will be called. */}
           <Form.Label>Description:</Form.Label>
           <Form.Control
             type="text"
-            value={description}
+            name="description"
             required
-            onChange={handleDescriptionChange}
+            onChangeonChange={handleInput}
           />
           <br />
           {/* when user write in email input box , handleEmailChange()
@@ -102,9 +62,9 @@ function Create() {
           <Form.Label>Filter:</Form.Label>
           <Form.Control
             type="text"
-            value={filter}
+            name="filter"
             required
-            onChange={handleFilterChange}
+            onChange={handleInput}
           />
           <br />
           {/* when user write in password input box ,
@@ -112,17 +72,17 @@ function Create() {
           <Form.Label>Start Date:</Form.Label>
           <Form.Control
             type="Date"
-            value={startDate}
+            name="startDate"
             required
-            onChange={handleStartDateChange}
+            onChange={handleInput}
           />
           <br />
           <Form.Label>End Date:</Form.Label>
           <Form.Control
             type="Date"
-            value={endDate}
+            name="endDate"
             required
-            onChange={handleEndDateChange}
+            onChange={handleInput}
           />
           <br />
           {/* when user write in confirm password  input box ,
