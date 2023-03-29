@@ -1,16 +1,27 @@
 import React, { useState, useEffect } from "react";
-import Card from "react-bootstrap/Card";
+import ListGroup from "react-bootstrap/ListGroup";
+import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
-import axios from 'axios';
+import axios from "axios";
+
 function NftCard() {
   const [show, setShow] = useState(false);
   const [selectedNFT, setSelectedNFT] = useState({});
   const [nfts, setNfts] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:3001/postdata")
+    fetch("https://shopify.beyondclub.xyz/node/postdata")
       .then((response) => response.json())
-      .then((data) => setNfts(data))
+      .then((data) => {
+        console.log("response data", data);
+        let res_array = [];
+        // for(let i in data) {
+        //    res_array.push([i,data[i]]);
+        // };
+        res_array = Array.from(Object.keys(data), (k) => data[k]);
+        console.log("res array", res_array);
+        setNfts(data);
+      })
       .catch((error) => console.log(error));
   }, []);
 
@@ -19,19 +30,9 @@ function NftCard() {
     setShow(true);
   };
 
-  // const handleDeleteClick = (nft) => {
-  //   fetch(`http://localhost:3001/postdata${nft.id}`, {
-  //     method: "DELETE",
-  //   })
-  //     .then(() => {
-  //       setNfts(nfts.filter((item) => item.id !== nft.id));
-  //     })
-  //     .catch((error) => console.log(error));
-  // };
-
   const handleDeleteClick = (nft) => {
     axios
-      .delete(`http://localhost:3001/postdata/${nft.id}`)
+      .delete(`https://shopify.beyondclub.xyz/node/postdata/${nft.id}`)
       .then((response) => {
         if (response.status === 200) {
           setNfts(nfts.filter((item) => item.id !== nft.id));
@@ -44,22 +45,26 @@ function NftCard() {
 
   return (
     <>
-      {nfts.map((nft) => (
-        <Card key={nft.id}>
-          <Card.Header>{nft.id}</Card.Header>
-          <Card.Body>
-            <Card.Text>{nft.title}</Card.Text>
-            <Card.Text>{nft.file}</Card.Text>
-            <Card.Text>{nft.description}</Card.Text>
-            <Card.Text>{nft.filter}</Card.Text>
-            <Card.Text>{nft.startDate}</Card.Text>
-            <Card.Text>{nft.endDate}</Card.Text>
-
-            <Card.Link onClick={() => handleViewClick(nft)}>View</Card.Link>
-            <Card.Link onClick={() => handleDeleteClick(nft)}>Delete</Card.Link>
-          </Card.Body>
-        </Card>
-      ))}
+      {nfts.length > 0 &&
+        Object.values(nfts).map((nft) => (
+          <>
+            <ListGroup.Item
+              as="li"
+              className="d-flex justify-content-between align-items-start"
+            >
+              <div className="ms-2 me-auto">
+                <div className="fw-bold">{nft.title}</div>
+                {nft.description}
+              </div>
+              <Button onClick={() => handleViewClick(nft)} variant="link">
+                View
+              </Button>
+              <Button onClick={() => handleDeleteClick(nft)} variant="link">
+                Delete
+              </Button>
+            </ListGroup.Item>
+          </>
+        ))}
 
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
@@ -67,7 +72,9 @@ function NftCard() {
         </Modal.Header>
         <Modal.Body>
           <p>{selectedNFT.description}</p>
-          <img src={selectedNFT.file} alt={selectedNFT.title} />
+          <p>{selectedNFT.startDate}</p>
+          <p>{selectedNFT.endDate}</p>
+          <p>{selectedNFT.filter}</p>
         </Modal.Body>
         <Modal.Footer>
           <button onClick={handleClose}>Close</button>

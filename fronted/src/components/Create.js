@@ -19,8 +19,8 @@ console.log(post)
    }
    function handleSubmit(event){
     event.preventDefault();
-    axios.post('http://localhost:3001/data',{post})
-    .then(response=>console.log(response))
+    axios.post('https://shopify.beyondclub.xyz/node/data',{post})
+    .then((response)=>{console.log(response);window.location.replace("/");})
     .catch(err=>console.log(err))
    }
 
@@ -54,9 +54,8 @@ console.log(post)
             type="text"
             name="description"
             required
-            onChangeonChange={handleInput}
+            onChange={handleInput}
           />
-          <br />
           {/* when user write in email input box , handleEmailChange()
             function will be called.*/}
           <Form.Label>Filter:</Form.Label>

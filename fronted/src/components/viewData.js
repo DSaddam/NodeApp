@@ -8,7 +8,7 @@ function NftCard() {
   const [nfts, setNfts] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:3001/postdata")
+    fetch("https://shopify.beyondclub.xyz/node/postdata")
       .then((response) => response.json())
       .then((data) => setNfts(data))
       .catch((error) => console.log(error));
@@ -20,7 +20,7 @@ function NftCard() {
   };
 
   const handleDeleteClick = (nft) => {
-    fetch(`http://localhost:3001/postdata${nft.id}`, {
+    fetch(`https://shopify.beyondclub.xyz/node/postdata/${nft.id}`, {
       method: "DELETE",
     })
       .then(() => {
